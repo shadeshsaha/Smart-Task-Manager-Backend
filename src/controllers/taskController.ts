@@ -6,11 +6,12 @@ export const createTask = async (req: Request, res: Response) => {
   try {
     const { title, description, priority, status, projectId, assignedToId } =
       req.body;
+    const file = req.file?.filename; // get uploaded file name
 
     // Capacity check
     if (assignedToId) {
       const member = await prisma.teamMember.findUnique({
-        where: { id: assignedToId },
+        where: { id: parseInt(assignedToId) },
         include: { tasks: true },
       });
       if (member && member.tasks.length >= member.capacity) {
@@ -26,8 +27,10 @@ export const createTask = async (req: Request, res: Response) => {
         description,
         priority,
         status,
-        projectId,
-        assignedToId: assignedToId || null,
+        projectId: parseInt(projectId),
+        assignedToId: assignedToId ? parseInt(assignedToId) : null,
+        // store file if any
+        ...(file && { attachment: file }),
       },
     });
 
