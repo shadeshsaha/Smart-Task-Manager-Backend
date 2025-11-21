@@ -64,6 +64,7 @@ model Task {
   description  String
   priority     String
   status       String
+  attachment   String? 
   projectId    Int
   project      Project     @relation("ProjectTasks", fields: [projectId], references: [id])
   assignedToId Int?
