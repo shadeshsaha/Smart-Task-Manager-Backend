@@ -2,8 +2,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import { teamRouter } from "./routes/team";
 import { userRouter } from "./routes/user";
-// import { teamRouter } from "./routes/team";
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/users", userRouter);
-// app.use("/api/teams", teamRouter);
+app.use("/api/teams", teamRouter);
 
 app.get("/", (req, res) => res.send("Smart Task Manager API is running"));
 
