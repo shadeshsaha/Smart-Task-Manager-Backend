@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import path from "path";
 import { projectRouter } from "./routes/project";
 import { reassignRouter } from "./routes/reassign";
 import { taskRouter } from "./routes/task";
@@ -23,6 +24,7 @@ app.use("/api/teams", teamRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/reassign", reassignRouter);
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.get("/", (req, res) => res.send("Smart Task Manager API is running"));
 
