@@ -4,12 +4,77 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ------------------ USER ------------------
+model User {
+  id         Int          @id @default(autoincrement())
+  name       String
+  role       String
+  email      String       @unique
+  password   String
+  teams      TeamMember[]
+  ownedTeams Team[]       @relation("TeamOwner") // Teams this user owns
+  createdAt  DateTime     @default(now())
+}
+
+// ------------------ TEAM ------------------
+model Team {
+  id        Int          @id @default(autoincrement())
+  name      String
+  ownerId   Int
+  owner     User         @relation("TeamOwner", fields: [ownerId], references: [id])
+  members   TeamMember[]
+  projects  Project[]
+  createdAt DateTime     @default(now())
+}
+
+// ------------------ TEAM MEMBER ------------------
+model TeamMember {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  teamId   Int
+  capacity Int
+  role     String
+  user     User   @relation(fields: [userId], references: [id])
+  team     Team   @relation(fields: [teamId], references: [id])
+  tasks    Task[]
+}
+
+// ------------------ PROJECT ------------------
+model Project {
+  id     Int    @id @default(autoincrement())
+  name   String
+  teamId Int
+  team   Team   @relation(fields: [teamId], references: [id])
+  tasks  Task[] @relation("ProjectTasks")
+}
+
+// ------------------ TASK ------------------
+model Task {
+  id           Int         @id @default(autoincrement())
+  title        String
+  description  String
+  priority     String
+  status       String
+  projectId    Int
+  project      Project     @relation("ProjectTasks", fields: [projectId], references: [id])
+  assignedToId Int?
+  assignedTo   TeamMember? @relation(fields: [assignedToId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+// ------------------ ACTIVITY LOG ------------------
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  message   String
+  createdAt DateTime @default(now())
 }
