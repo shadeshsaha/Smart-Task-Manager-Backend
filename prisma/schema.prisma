@@ -17,7 +17,7 @@ generator client {
 model User {
   id         Int          @id @default(autoincrement())
   name       String
-  role       String
+  role       Role         @default(USER)
   email      String       @unique
   password   String
   teams      TeamMember[]
@@ -64,7 +64,7 @@ model Task {
   description  String
   priority     String
   status       String
-  attachment   String? 
+  attachment   String?
   projectId    Int
   project      Project     @relation("ProjectTasks", fields: [projectId], references: [id])
   assignedToId Int?
@@ -78,4 +78,9 @@ model ActivityLog {
   id        Int      @id @default(autoincrement())
   message   String
   createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  USER
 }

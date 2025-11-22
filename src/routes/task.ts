@@ -14,13 +14,12 @@ import {
 
 export const taskRouter = Router();
 
-taskRouter.post("/", authenticate, createTask);
-taskRouter.get("/", authenticate, getTasks);
-taskRouter.post("/auto-assign", authenticate, autoAssignTask);
+// taskRouter.post("/", authenticate, createTask);
+// taskRouter.post("/auto-assign", authenticate, autoAssignTask);
 taskRouter.post(
   "/",
   authenticate,
-  upload.single("file"),
+  upload.single("attachment"),
   validate(createTaskSchema),
   createTask
 );
@@ -30,3 +29,4 @@ taskRouter.post(
   validate(autoAssignSchema),
   autoAssignTask
 );
+taskRouter.get("/", authenticate, getTasks);

@@ -3,3 +3,5 @@ node_modules
 .env
 
 /src/generated/prisma
+
+SmartTaskManager.postman_collection.md
