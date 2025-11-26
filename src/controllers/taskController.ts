@@ -14,8 +14,9 @@ export const createTask = async (req: Request, res: Response) => {
     if (assignedToId) {
       const member = await prisma.teamMember.findUnique({
         where: { id: parseInt(assignedToId) },
-        include: { tasks: true },
+        include: { tasks: true, user: true },
       });
+
       if (member && member.tasks.length >= member.capacity) {
         return res.status(httpStatus.BAD_REQUEST).json({
           warning: `${member.userId} has ${member.tasks.length} tasks but capacity is ${member.capacity}. Assign anyway?`,
@@ -64,20 +65,23 @@ export const createTask = async (req: Request, res: Response) => {
 // };
 
 export const getTasks = async (req: Request, res: Response) => {
-  const { status, priority, projectId } = req.query;
-
+  const { status, priority, projectId, assignedToId } = req.query;
   const filters: any = {};
 
   if (status) filters.status = status;
   if (priority) filters.priority = priority;
   if (projectId) filters.projectId = Number(projectId);
+  if (assignedToId) filters.assignedToId = Number(assignedToId);
 
-  const tasks = await prisma.task.findMany({
-    where: filters,
-  });
-  console.log("tasks", tasks);
-
-  res.json({ tasks });
+  try {
+    const tasks = await prisma.task.findMany({
+      where: filters,
+    });
+    console.log("tasks", tasks);
+    res.json({ tasks });
+  } catch (error: any) {
+    res.status(httpStatus.BAD_REQUEST).json({ error: error.message });
+  }
 };
 
 // Auto-assign task to member with least load
