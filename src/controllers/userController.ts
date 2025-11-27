@@ -9,12 +9,30 @@ const JWT_SECRET = process.env.JWT_SECRET || "secret";
 export const registerUser = async (req: Request, res: Response) => {
   try {
     // console.log("req.body", req.body);
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
+
+    // VALIDATE REQUIRED FIELDS
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "Name, email, and password are required",
+      });
+    }
+
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Safe role handling
+    const role = req.body.role || "USER";
     // Ensure the role matches Prisma enum
     const normalizedRole = role.toUpperCase();
 
+    // Validate role enum
     if (!["ADMIN", "USER"].includes(normalizedRole)) {
       return res
         .status(400)
